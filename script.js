@@ -4,9 +4,12 @@ const stickerPalette = document.querySelector('.stickers');
 const resetBtn = document.querySelector('.reset');
 let dragClone = null, draggedSticker = null, offsetX = 0, offsetY = 0;
 
-// === 스티커 드래그 & 드롭 ===
+// === 스티커 드래그 & 드롭 (마우스+터치+펜 통합: Pointer Events) ===
 stickers.forEach(sticker => {
-  sticker.addEventListener('mousedown', e => {
+  // 터치 드래그가 스크롤로 인식되지 않게 막기
+  sticker.style.touchAction = "none";
+
+  sticker.addEventListener('pointerdown', e => {
     draggedSticker = sticker;
     const rect = sticker.getBoundingClientRect();
     offsetX = e.clientX - rect.left;
@@ -20,10 +23,12 @@ stickers.forEach(sticker => {
     dragClone.style.left = e.pageX - offsetX + 'px';
     dragClone.style.top = e.pageY - offsetY + 'px';
     document.body.appendChild(dragClone);
+
+    e.preventDefault(); // 브라우저 기본 스크롤/선택 방지
   });
 });
 
-document.addEventListener('mousemove', e => {
+document.addEventListener('pointermove', e => {
   if (dragClone) {
     dragClone.style.left = e.pageX - offsetX + 'px';
     dragClone.style.top = e.pageY - offsetY + 'px';
@@ -35,7 +40,7 @@ document.addEventListener('mousemove', e => {
   });
 });
 
-document.addEventListener('mouseup', e => {
+document.addEventListener('pointerup', e => {
   if (!dragClone || !draggedSticker) return;
   let dropped = false;
   dropzones.forEach(zone => {
@@ -121,17 +126,14 @@ checkBtn.addEventListener('click', () => {
   }
 });
 
-// === 폭죽 효과 (화면 사방 랜덤 위치) ===
+// === 폭죽 효과 ===
 function createFireworks() {
   const numFireworks = 7;
   for (let i = 0; i < numFireworks; i++) {
     const fw = document.createElement('div');
     fw.classList.add('firework');
-
-    // 화면 랜덤 위치
     fw.style.left = `${Math.random() * window.innerWidth}px`;
     fw.style.top = `${Math.random() * window.innerHeight}px`;
-
     document.body.appendChild(fw);
 
     const color = `hsl(${Math.random() * 360}, 100%, 60%)`;
@@ -158,7 +160,7 @@ function createFireworks() {
   }
 }
 
-// === 중앙 "정답" 표시 (흰색 글씨 + 청록 네온) ===
+// === 중앙 "정답" 표시 ===
 function showCorrectText() {
   const text = document.createElement('div');
   text.textContent = '정답';
@@ -168,7 +170,7 @@ function showCorrectText() {
   text.style.transform = 'translate(-50%, -50%)';
   text.style.fontSize = '120px';
   text.style.fontWeight = '900';
-  text.style.color = '#ffffff'; // 흰색
+  text.style.color = '#ffffff';
   text.style.textShadow = '0 0 25px #00e6b8, 0 0 50px #00ffee, 0 0 80px #00bfa5';
   text.style.opacity = '0';
   text.style.transition = 'opacity 0.5s';
@@ -213,4 +215,3 @@ style.textContent = `
 }
 `;
 document.head.appendChild(style);
-
