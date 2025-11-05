@@ -6,8 +6,7 @@ let dragClone = null, draggedSticker = null, offsetX = 0, offsetY = 0;
 
 // === 스티커 드래그 & 드롭 (마우스+터치+펜 통합: Pointer Events) ===
 stickers.forEach(sticker => {
-  // 터치 드래그가 스크롤로 인식되지 않게 막기
-  sticker.style.touchAction = "none";
+  sticker.style.touchAction = "none"; // 터치 스크롤 방지
 
   sticker.addEventListener('pointerdown', e => {
     draggedSticker = sticker;
@@ -15,23 +14,29 @@ stickers.forEach(sticker => {
     offsetX = e.clientX - rect.left;
     offsetY = e.clientY - rect.top;
 
+    // ✅ 복제본 만들기 (손 아래 따라다니는 그림)
     dragClone = sticker.cloneNode(true);
     dragClone.classList.add('drag-clone');
-    dragClone.style.position = 'absolute';
+    dragClone.style.position = 'fixed';
     dragClone.style.pointerEvents = 'none';
     dragClone.style.zIndex = 1000;
-    dragClone.style.left = e.pageX - offsetX + 'px';
-    dragClone.style.top = e.pageY - offsetY + 'px';
+    dragClone.style.left = e.clientX - offsetX + 'px';
+    dragClone.style.top = e.clientY - offsetY + 'px';
+    dragClone.style.transform = 'scale(1.1)';
+    dragClone.style.opacity = '0.9';
     document.body.appendChild(dragClone);
 
-    e.preventDefault(); // 브라우저 기본 스크롤/선택 방지
+    // ✅ 원본 숨기기
+    sticker.style.visibility = 'hidden';
+
+    e.preventDefault();
   });
 });
 
 document.addEventListener('pointermove', e => {
   if (dragClone) {
-    dragClone.style.left = e.pageX - offsetX + 'px';
-    dragClone.style.top = e.pageY - offsetY + 'px';
+    dragClone.style.left = e.clientX - offsetX + 'px';
+    dragClone.style.top = e.clientY - offsetY + 'px';
   }
   dropzones.forEach(zone => {
     const r = zone.getBoundingClientRect();
@@ -51,10 +56,15 @@ document.addEventListener('pointerup', e => {
     }
     zone.classList.remove('_active');
   });
-  if (!dropped) stickerPalette.appendChild(draggedSticker);
+
+  // ✅ 원본 복구 + 복제본 제거
+  draggedSticker.style.visibility = 'visible';
   dragClone.remove();
   dragClone = null;
+
+  if (!dropped) stickerPalette.appendChild(draggedSticker);
   draggedSticker = null;
+
   updateTotal();
 });
 

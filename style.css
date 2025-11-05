@@ -30,11 +30,11 @@ header h1 {
   background: #0077ff;
   color: white;
   border: none;
-  padding: 0.4em 1em;
-  border-radius: 0.5em;
+  padding: 0.6em 1.4em;   /* 크기 확대 */
+  border-radius: 0.6em;   /* 살짝 더 둥글게 */
   cursor: pointer;
   font-weight: bold;
-  font-size: clamp(12px, 0.9vw, 16px);
+  font-size: clamp(14px, 1vw, 18px); /* 글자 크기 확대 */
 }
 .reset:hover { background: #005fcc; }
 
@@ -184,10 +184,11 @@ header h1 {
   background: #0077ff;
   color: white;
   border: none;
-  padding: 0.6em 1em;
-  border-radius: 0.5em;
+  padding: 0.8em 1.4em;   /* 크기 확대 */
+  border-radius: 0.6em;   /* 둥글게 */
   cursor: pointer;
   font-weight: 600;
+  font-size: clamp(14px, 1vw, 18px); /* 글자 크기 확대 */
 }
 .check-btn:hover { background: #005fcc; }
 
