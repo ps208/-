@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>스티커 가격 드래그 & 드롭</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <button class="reset">초기화</button>
+    <h1>이천세무고등학교</h1>
+  </header>
+
+  <main class="wrap">
+    <!-- 스티커 목록 -->
+    <section class="sticker-palette">
+      <h2>물품 목록</h2>
+      <div class="stickers">
+        <div class="sticker" data-value="쌀" data-price="1000" style="background:salmon">A<br>₩1000</div>
+        <div class="sticker" data-value="시내버스" data-price="2000" style="background:lightgreen">B<br>₩2000</div>
+        <div class="sticker" data-value="복권" data-price="3000" style="background:lightblue">C<br>₩3000</div>
+        <div class="sticker" data-value="영화티켓" data-price="5000" style="background:plum">D<br>₩5000</div>
+        <div class="sticker" data-value="신문" data-price="4000" style="background:salmon">E<br>₩4000</div>
+        <div class="sticker" data-value="사과" data-price="4000" style="background:lightgreen">E<br>₩4000</div>
+        <div class="sticker" data-value="돼지고기" data-price="4000" style="background:lightblue">E<br>₩4000</div>
+        <div class="sticker" data-value="생수" data-price="4000" style="background:plum">E<br>₩4000</div>
+        <div class="sticker" data-value="스마트폰" data-price="4000" style="background:salmon">E<br>₩4000</div>
+        <div class="sticker" data-value="항공기" data-price="4000" style="background:lightgreen">E<br>₩4000</div>
+        <div class="sticker" data-value="제육볶음" data-price="4000" style="background:lightblue">E<br>₩4000</div>
+        <div class="sticker" data-value="사과주스" data-price="4000" style="background:plum">E<br>₩4000</div>
+        <div class="sticker" data-value="햇반" data-price="4000" style="background:salmon">E<br>₩4000</div>
+      </div>
+      <p class="hint">스티커를 클릭 후 이동 → 영역에 놓기</p>
+    </section>
+
+    <!-- 드롭 영역 -->
+    <section class="dropzones">
+      <div class="dropzone" data-name="zone1">
+        <strong>과세</strong>
+        <div class="drop-content"></div>
+        <div class="total">총합: ₩0</div>
+      </div>
+
+      <div class="dropzone" data-name="zone2">
+        <strong>면세</strong>
+        <div class="drop-content"></div>
+        <div class="total">총합: ₩0</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 계산기 + 정답 입력칸 -->
+  <section class="bottom-tools">
+    <div class="calculator">
+      <input class="calc-display" type="text" readonly>
+      <div class="calc-buttons">
+        <button class="calc-btn" data-value="7">7</button>
+        <button class="calc-btn" data-value="8">8</button>
+        <button class="calc-btn" data-value="9">9</button>
+        <button class="calc-btn op-btn" data-value="+">+</button>
+
+        <button class="calc-btn" data-value="4">4</button>
+        <button class="calc-btn" data-value="5">5</button>
+        <button class="calc-btn" data-value="6">6</button>
+        <button class="calc-btn op-btn" data-value="-">-</button>
+
+        <button class="calc-btn" data-value="1">1</button>
+        <button class="calc-btn" data-value="2">2</button>
+        <button class="calc-btn" data-value="3">3</button>
+        <button class="calc-btn op-btn" data-value="×">×</button>
+
+        <button class="calc-btn" data-value="C" id="clear">C</button>
+        <button class="calc-btn" data-value="0">0</button>
+        <button class="calc-btn op-btn" data-value="=" id="equal">=</button>
+        <button class="calc-btn op-btn" data-value="÷">÷</button>
+      </div>
+    </div>
+
+    <div class="answer-section">
+      <div class="answer-box">
+        <label>₩</label>
+        <input type="number" class="answer-input" placeholder="정답 입력">
+        <button class="check-btn">확인</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
