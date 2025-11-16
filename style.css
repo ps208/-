@@ -30,11 +30,11 @@ header h1 {
   background: #0077ff;
   color: white;
   border: none;
-  padding: 0.6em 1.4em;   /* 크기 확대 */
-  border-radius: 0.6em;   /* 살짝 더 둥글게 */
+  padding: 0.6em 1.4em;
+  border-radius: 0.6em;
   cursor: pointer;
   font-weight: bold;
-  font-size: clamp(14px, 1vw, 18px); /* 글자 크기 확대 */
+  font-size: clamp(14px, 1vw, 18px);
 }
 .reset:hover { background: #005fcc; }
 
@@ -48,7 +48,7 @@ header h1 {
 }
 
 .sticker-palette {
-  width: clamp(180px, var(--palette-width), 240px);
+  flex: 0 0 clamp(220px, 28vw, 340px); /*width: clamp(180px, var(--palette-width), 240px);*/
   background: white;
   border-radius: 0.8vw;
   padding: 1vw;
@@ -61,26 +61,60 @@ header h1 {
   flex-wrap: wrap;
   gap: 0.5vw;
 }
-.sticker {
-  width: clamp(45px, 5vw, 60px);
-  height: clamp(45px, 5vw, 60px);
-  border-radius: 0.6vw;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 0.3vw 0.8vw rgba(0,0,0,0.15);
-  transition: transform 0.12s ease;
-  user-select: none;
 
-  /* 추가: 글자 크기 스티커 비율에 맞춤 */
-  font-size: calc(min(5vw, 60px) / 4);
-  text-align: center;
-  line-height: 1.2em;
-  word-break: break-word;
+/* ===================================== */
+/*       스티커 전체(그림+이름+가격)       */
+/* ===================================== */
+.sticker-wrap {
+  width: clamp(45px, 6vw, 60px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+
+  min-height: 90px;
+}
+
+/* 스티커 본체(정사각형) */
+.sticker {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.6vw;
+  background: white;
+  box-shadow: 0 0.3vw 0.8vw rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+  transition: transform 0.12s;
 }
 .sticker:active { transform: scale(0.95); }
+
+/* 스티커 이미지 */
+.sticker img {
+  width: 75%;
+  height: 55%;
+  object-fit: contain;
+  margin-top: 3px;
+}
+
+/* 스티커 이름 */
+.sticker .label {
+  font-size: 0.9em;
+  font-weight: 700;
+  margin-top: 3px;
+}
+
+/* 가격 (스티커 아래) */
+.sticker-wrap .price {
+  margin-top: 3px;
+  font-size: 0.8em;
+  color: #444;
+  pointer-events: none;
+}
+
+/* ===================================== */
 
 .dropzones {
   display: flex;
@@ -99,11 +133,25 @@ header h1 {
   box-sizing: border-box;
   box-shadow: 0 0.4vw 1vw rgba(0,0,0,0.05);
 }
-.dropzone strong { font-size: 1.2em; display: block; margin-bottom: 0.6vw; }
-.drop-content { display: flex; flex-wrap: wrap; gap: 0.6vw; }
-.total { margin-top: 0.6vw; font-weight: bold; }
+.dropzone strong {
+  font-size: 1.2em;
+  display: block;
+  margin-bottom: 0.6vw;
+}
+.drop-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6vw;
+}
+.total {
+  margin-top: 0.6vw;
+  font-weight: bold;
+}
 
-.dropzone._active { border-color: #0077ff; background: #f0f8ff; }
+.dropzone._active {
+  border-color: #0077ff;
+  background: #f0f8ff;
+}
 
 /* 아래 도구 */
 .bottom-tools {
@@ -151,14 +199,20 @@ header h1 {
 }
 .calc-btn:hover { background: #dcdcdc; }
 
-/* 연산자 버튼 강조 */
 .op-btn {
   font-size: clamp(20px, 1.6vw, 26px);
   background: #f3f3f3;
 }
 
-#equal { background: #0077ff; color: white; font-size: clamp(22px, 1.8vw, 28px); }
-#clear { background: orange; color: white; }
+#equal {
+  background: #0077ff;
+  color: white;
+  font-size: clamp(22px, 1.8vw, 28px);
+}
+#clear {
+  background: orange;
+  color: white;
+}
 
 .answer-section {
   flex: 1;
@@ -184,13 +238,15 @@ header h1 {
   background: #0077ff;
   color: white;
   border: none;
-  padding: 0.8em 1.4em;   /* 크기 확대 */
-  border-radius: 0.6em;   /* 둥글게 */
+  padding: 0.8em 1.4em;
+  border-radius: 0.6em;
   cursor: pointer;
   font-weight: 600;
-  font-size: clamp(14px, 1vw, 18px); /* 글자 크기 확대 */
+  font-size: clamp(14px, 1vw, 18px);
 }
-.check-btn:hover { background: #005fcc; }
+.check-btn:hover {
+  background: #005fcc;
+}
 
 /* 폭죽 */
 .firework {
@@ -206,10 +262,26 @@ header h1 {
   100% { transform: translateY(-200px) scale(0); opacity: 0; }
 }
 
-/* 반응형 조정 */
+/* 반응형 */
 @media (max-width: 800px) {
   .wrap { flex-direction: column; align-items: center; }
   .bottom-tools { flex-direction: column; align-items: center; }
   .calculator, .answer-section { width: 90%; }
   header h1 { font-size: 18px; }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo img {
+  width: 10vw;
+}
+
+.drag-clone {
+  opacity: 0.9;
+  transform: scale(1.1);
+  pointer-events: none;
 }

@@ -1,20 +1,30 @@
-const stickers = document.querySelectorAll('.sticker');
+/********************************************
+ *   드래그 & 드롭 기본 변수
+ ********************************************/
+const stickers = document.querySelectorAll('.sticker-wrap');
 const dropzones = document.querySelectorAll('.dropzone');
 const stickerPalette = document.querySelector('.stickers');
 const resetBtn = document.querySelector('.reset');
+
 let dragClone = null, draggedSticker = null, offsetX = 0, offsetY = 0;
 
-// === 스티커 드래그 & 드롭 (마우스+터치+펜 통합: Pointer Events) ===
+/* 연속 클릭 방지 */
+let effectLock = false;
+
+
+/********************************************
+ *   드래그 & 드롭
+ ********************************************/
 stickers.forEach(sticker => {
-  sticker.style.touchAction = "none"; // 터치 스크롤 방지
+  sticker.style.touchAction = "none";
 
   sticker.addEventListener('pointerdown', e => {
     draggedSticker = sticker;
+
     const rect = sticker.getBoundingClientRect();
     offsetX = e.clientX - rect.left;
     offsetY = e.clientY - rect.top;
 
-    // ✅ 복제본 만들기 (손 아래 따라다니는 그림)
     dragClone = sticker.cloneNode(true);
     dragClone.classList.add('drag-clone');
     dragClone.style.position = 'fixed';
@@ -26,7 +36,6 @@ stickers.forEach(sticker => {
     dragClone.style.opacity = '0.9';
     document.body.appendChild(dragClone);
 
-    // ✅ 원본 숨기기
     sticker.style.visibility = 'hidden';
 
     e.preventDefault();
@@ -38,48 +47,64 @@ document.addEventListener('pointermove', e => {
     dragClone.style.left = e.clientX - offsetX + 'px';
     dragClone.style.top = e.clientY - offsetY + 'px';
   }
+
   dropzones.forEach(zone => {
     const r = zone.getBoundingClientRect();
-    const inside = e.clientX > r.left && e.clientX < r.right && e.clientY > r.top && e.clientY < r.bottom;
+    const inside =
+      e.clientX > r.left && e.clientX < r.right &&
+      e.clientY > r.top && e.clientY < r.bottom;
     zone.classList.toggle('_active', inside);
   });
 });
 
 document.addEventListener('pointerup', e => {
   if (!dragClone || !draggedSticker) return;
+
   let dropped = false;
+
   dropzones.forEach(zone => {
     const r = zone.getBoundingClientRect();
-    if (e.clientX > r.left && e.clientX < r.right && e.clientY > r.top && e.clientY < r.bottom) {
+
+    if (
+      e.clientX > r.left && e.clientX < r.right &&
+      e.clientY > r.top && e.clientY < r.bottom
+    ) {
       zone.querySelector('.drop-content').appendChild(draggedSticker);
       dropped = true;
     }
     zone.classList.remove('_active');
   });
 
-  // ✅ 원본 복구 + 복제본 제거
   draggedSticker.style.visibility = 'visible';
   dragClone.remove();
   dragClone = null;
 
   if (!dropped) stickerPalette.appendChild(draggedSticker);
+
   draggedSticker = null;
 
   updateTotal();
 });
 
+
+/********************************************
+ *   합계 계산
+ ********************************************/
 function updateTotal() {
   dropzones.forEach(zone => {
-    const s = zone.querySelectorAll('.drop-content .sticker');
+    const s = zone.querySelectorAll('.drop-content .sticker-wrap');
     let t = 0;
     s.forEach(e => t += Number(e.dataset.price));
     zone.querySelector('.total').textContent = `총합: ₩${t.toLocaleString()}`;
   });
 }
 
-// === 초기화 버튼 ===
+
+/********************************************
+ *   초기화
+ ********************************************/
 resetBtn.addEventListener('click', () => {
-  const all = document.querySelectorAll('.sticker');
+  const all = document.querySelectorAll('.sticker-wrap');
   all.forEach(s => stickerPalette.appendChild(s));
   updateTotal();
 
@@ -88,14 +113,10 @@ resetBtn.addEventListener('click', () => {
   answerInput.value = '';
 });
 
-// 스티커 가격 표시 천 단위 구분
-document.querySelectorAll('.sticker').forEach(sticker => {
-  const price = Number(sticker.dataset.price);
-  const formatted = price.toLocaleString();
-  sticker.innerHTML = `${sticker.dataset.value}<br>₩${formatted}`;
-});
 
-// === 계산기 ===
+/********************************************
+ *   계산기
+ ********************************************/
 const calcDisplay = document.querySelector('.calc-display');
 const calcButtons = document.querySelectorAll('.calc-btn');
 let calcValue = '';
@@ -108,7 +129,9 @@ calcButtons.forEach(btn => {
       calcValue = '';
     } else if (val === '=') {
       try {
-        calcValue = eval(calcValue.replace(/÷/g, '/').replace(/×/g, '*')).toString();
+        calcValue = eval(
+          calcValue.replace(/÷/g, '/').replace(/×/g, '*')
+        ).toString();
       } catch {
         calcValue = 'Error';
       }
@@ -125,53 +148,31 @@ calcButtons.forEach(btn => {
   });
 });
 
-// === 정답 체크 ===
+
+/********************************************
+ *   정답 체크
+ ********************************************/
 const answerInput = document.querySelector('.answer-input');
 const checkBtn = document.querySelector('.check-btn');
 
 checkBtn.addEventListener('click', () => {
+  if (effectLock) return;
+
   if (answerInput.value === '9999') {
-    createFireworks();
     showCorrectText();
+    fireworkBurstSequence();
+  } else {
+    showWrongText();
   }
 });
 
-// === 폭죽 효과 ===
-function createFireworks() {
-  const numFireworks = 7;
-  for (let i = 0; i < numFireworks; i++) {
-    const fw = document.createElement('div');
-    fw.classList.add('firework');
-    fw.style.left = `${Math.random() * window.innerWidth}px`;
-    fw.style.top = `${Math.random() * window.innerHeight}px`;
-    document.body.appendChild(fw);
 
-    const color = `hsl(${Math.random() * 360}, 100%, 60%)`;
-    for (let j = 0; j < 40; j++) {
-      const particle = document.createElement('span');
-      particle.classList.add('particle');
-      const angle = (Math.PI * 2 * j) / 40;
-      const distance = 100 + Math.random() * 70;
-      const x = Math.cos(angle) * distance;
-      const y = Math.sin(angle) * distance;
-      particle.style.setProperty('--x', `${x}px`);
-      particle.style.setProperty('--y', `${y}px`);
-      particle.style.background = color;
-      particle.style.boxShadow = `0 0 12px ${color}`;
-      fw.appendChild(particle);
-    }
-
-    fw.animate(
-      [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(0.3)', opacity: 0 }],
-      { duration: 1500, easing: 'ease-out' }
-    );
-
-    setTimeout(() => fw.remove(), 1500);
-  }
-}
-
-// === 중앙 "정답" 표시 ===
+/********************************************
+ *   정답 텍스트 (원래 후광 그대로)
+ ********************************************/
 function showCorrectText() {
+  effectLock = true;
+
   const text = document.createElement('div');
   text.textContent = '정답';
   text.style.position = 'fixed';
@@ -180,48 +181,161 @@ function showCorrectText() {
   text.style.transform = 'translate(-50%, -50%)';
   text.style.fontSize = '120px';
   text.style.fontWeight = '900';
-  text.style.color = '#ffffff';
-  text.style.textShadow = '0 0 25px #00e6b8, 0 0 50px #00ffee, 0 0 80px #00bfa5';
+  text.style.color = '#fff';
+
+  // 🔵 원래 후광 그대로
+  text.style.textShadow =
+    '0 0 25px #00e6b8, 0 0 50px #00ffee, 0 0 80px #00bfa5';
+
   text.style.opacity = '0';
   text.style.transition = 'opacity 0.5s';
   text.style.zIndex = 9999;
   document.body.appendChild(text);
 
-  requestAnimationFrame(() => {
-    text.style.opacity = '1';
-  });
-
+  requestAnimationFrame(() => text.style.opacity = '1');
   setTimeout(() => {
     text.style.opacity = '0';
-    setTimeout(() => text.remove(), 500);
+    setTimeout(() => text.remove(), 600);
+    effectLock = false;
   }, 2000);
 }
 
-// === 폭죽 스타일 ===
+
+/********************************************
+ *   오답 텍스트 + 흔들림
+ ********************************************/
+function showWrongText() {
+  effectLock = true;
+
+  const text = document.createElement('div');
+  text.textContent = '오답';
+  text.style.position = 'fixed';
+  text.style.top = '50%';
+  text.style.left = '50%';
+  text.style.transform = 'translate(-50%, -50%)';
+  text.style.fontSize = '120px';
+  text.style.fontWeight = '900';
+  text.style.color = '#fff';
+  text.style.textShadow =
+    '0 0 40px #ff4444, 0 0 80px #ff2222, 0 0 120px #cc0000';
+  text.style.zIndex = 9999;
+  text.style.opacity = '0';
+  text.style.transition = 'opacity 0.3s';
+
+  document.body.appendChild(text);
+
+  setTimeout(() => text.style.opacity = '1', 10);
+
+  setTimeout(() => {
+    text.style.opacity = '0';
+    setTimeout(() => text.remove(), 400);
+    effectLock = false;
+  }, 1200);
+
+  document.body.classList.add('shake');
+  setTimeout(() => document.body.classList.remove('shake'), 500);
+}
+
+
+/********************************************
+ *   폭죽 생성 (CSS 기반)
+ ********************************************/
+function spawnFirework() {
+  const fw = document.createElement('div');
+  fw.className = 'fw-root';
+
+  fw.style.left = `${Math.random() * window.innerWidth}px`;
+  fw.style.top = `${window.innerHeight * (0.3 + Math.random() * 0.3)}px`;
+
+  document.body.appendChild(fw);
+
+  const count = 100; //폭죽 개수
+
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'fw-particle';
+
+    const angle = (Math.PI * 2 * i) / count;
+    const distance = 120 + Math.random() * 120;
+
+    p.style.setProperty('--x', `${Math.cos(angle) * distance}px`);
+    p.style.setProperty('--y', `${Math.sin(angle) * distance}px`);
+
+    const o = Math.floor(200 + Math.random() * 55);
+    p.style.background = `rgb(255,${o},120)`;
+    p.style.boxShadow = `0 0 10px rgb(255,${o},120)`;
+
+    fw.appendChild(p);
+  }
+
+  setTimeout(() => fw.remove(), 3500);
+}
+
+function fireworkBurstSequence() {
+    spawnFirework();
+    setTimeout(spawnFirework, 200);
+    setTimeout(spawnFirework, 400);
+    setTimeout(spawnFirework, 600);
+    setTimeout(spawnFirework, 800);
+    setTimeout(spawnFirework, 1000);
+    setTimeout(spawnFirework, 1200);
+    setTimeout(spawnFirework, 1400);
+}
+
+
+/********************************************
+ *   폭죽 + 흔들림 CSS
+ ********************************************/
 const style = document.createElement('style');
 style.textContent = `
-.firework {
+.fw-root {
   position: fixed;
   pointer-events: none;
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   transform: translate(-50%, -50%);
+  z-index: 9999;
 }
-.firework .particle {
+
+.fw-particle {
   position: absolute;
   top: 0;
   left: 0;
-  width: 10px;
-  height: 10px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  transform: translate(0, 0);
-  animation: particleMove 1.5s ease-out forwards;
+  animation: fw-explode 3.5s ease-out forwards;
 }
-@keyframes particleMove {
-  to {
-    transform: translate(var(--x), var(--y)) scale(0.2);
+
+@keyframes fw-explode {
+  0% {
+    transform: translate(0,0) scale(1.2);
+    opacity: 1;
+  }
+  40% {
+    transform: translate(var(--x), var(--y)) scale(0.8);
+    opacity: 0.9;
+  }
+  75% {
+    transform: translate(var(--x), calc(var(--y) + 60px)) scale(0.5);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(var(--x), calc(var(--y) + 120px)) scale(0.2);
     opacity: 0;
   }
+}
+
+@keyframes shakeAnim {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-15px); }
+  40% { transform: translateX(15px); }
+  60% { transform: translateX(-10px); }
+  80% { transform: translateX(10px); }
+  100% { transform: translateX(0); }
+}
+body.shake {
+  animation: shakeAnim 0.45s ease-in-out;
 }
 `;
 document.head.appendChild(style);
