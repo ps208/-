@@ -133,18 +133,15 @@ calcButtons.forEach(btn => {
           calcValue.replace(/÷/g, '/').replace(/×/g, '*')
         ).toString();
       } catch {
-        calcValue = 'Error';
+        calcValue = '';
+        calcDisplay.value = '';
+        return;
       }
     } else {
       calcValue += val;
     }
 
-    if (!isNaN(Number(calcValue.replace(/,/g, '')))) {
-      const num = Number(calcValue.replace(/,/g, ''));
-      calcDisplay.value = num.toLocaleString();
-    } else {
-      calcDisplay.value = calcValue;
-    }
+    calcDisplay.value = calcValue;
   });
 });
 
@@ -158,9 +155,13 @@ const checkBtn = document.querySelector('.check-btn');
 checkBtn.addEventListener('click', () => {
   if (effectLock) return;
 
-  if (answerInput.value === '9999') {
+  if (answerInput.value === '112500') {
     showCorrectText();
     fireworkBurstSequence();
+  } else if (answerInput.value === '2008') {
+    alert("( ﾟ▽ﾟ)/");
+  } else if (answerInput.value === '1125') {
+    alert("Correct Answer = ₩112,500");
   } else {
     showWrongText();
   }
